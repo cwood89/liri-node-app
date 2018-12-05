@@ -1,5 +1,3 @@
-// \n=new line - use to limit amount of console logs
-
 require("dotenv").config();
 var chalk = require("chalk")
 var moment = require("moment");
@@ -24,15 +22,18 @@ function searchLiri() {
                 if (err) {
                     return console.log('Error occurred: ' + err);
                 }
-                console.log(chalk.redBright.bold("Song:"))
-                console.log(data.tracks.items[0].name)
-                console.log(chalk.redBright.bold("Artist:"));
-                console.log(data.tracks.items[0].artists[0].name);
-                console.log(chalk.redBright.bold("Spotify Link:"));
-                console.log(data.tracks.items[0].external_urls.spotify);
-                console.log(chalk.redBright.bold("Album:"));
-                console.log(data.tracks.items[0].album.name);
+
+                console.log(`${chalk.redBright.bold("Song:")}
+${data.tracks.items[0].name} 
+${chalk.redBright.bold("Artist:")}
+${data.tracks.items[0].artists[0].name}
+${chalk.redBright.bold("Spotify Link:")}
+${data.tracks.items[0].external_urls.spotify}
+${chalk.redBright.bold("Album:")}
+${data.tracks.items[0].album.name}`)
+
             });
+
             break;
         // spotify artist search========================================================================
         case "spotify-this-artist":
@@ -40,11 +41,14 @@ function searchLiri() {
                 if (err) {
                     return console.log('Error occurred: ' + err);
                 }
-                console.log(chalk.redBright.bold("Artist:"))
-                console.log(data.artists.items[0].name);
-                console.log(chalk.redBright.bold("Genre:"))
-                console.log(data.artists.items[0].genres[0]);
+
+                console.log(`${chalk.redBright.bold("Artist:")}
+${data.artists.items[0].name}
+${chalk.redBright.bold("Genre:")}
+${data.artists.items[0].genres[0]}`)
+
             });
+
             spotify.search({ type: 'track', query: search, limit: 5 }, function (err, data) {
                 if (err) {
                     return console.log('Error occurred: ' + err);
@@ -60,22 +64,23 @@ function searchLiri() {
             var queryUrl = "http://www.omdbapi.com/?t=" + search + "&y=&plot=short&apikey=trilogy";
             axios.get(queryUrl).then(
                 function (response) {
-                    console.log(chalk.redBright.bold("Title:"));
-                    console.log(response.data.Title);
-                    console.log(chalk.redBright.bold("Year:"));
-                    console.log(response.data.Year);
-                    console.log(chalk.redBright.bold("IMDB Rating:"));
-                    console.log(response.data.Ratings[0].Value);
-                    console.log(chalk.redBright.bold("Rotten Tomatoes Rating:"));
-                    console.log(response.data.Ratings[1].Value);
-                    console.log(chalk.redBright.bold("Country:"));
-                    console.log(response.data.Country);
-                    console.log(chalk.redBright.bold("Language:"));
-                    console.log(response.data.Language);
-                    console.log(chalk.redBright.bold("Plot:"));
-                    console.log(response.data.Plot);
-                    console.log(chalk.redBright.bold("Actors:"));
-                    console.log(response.data.Actors);
+                    console.log(`${chalk.redBright.bold("Title:")}
+${response.data.Title}
+${chalk.redBright.bold("Year:")}
+${response.data.Year}
+${chalk.redBright.bold("IMDB Rating:")}
+${response.data.Ratings[0].Value}
+${chalk.redBright.bold("Rotten Tomatoes Rating:")}
+${response.data.Ratings[1].Value}
+${chalk.redBright.bold("Country:")}
+${response.data.Country}
+${chalk.redBright.bold("Language:")}
+${response.data.Language}
+${chalk.redBright.bold("Plot:")}
+${response.data.Plot}
+${chalk.redBright.bold("Actors:")}
+${response.data.Actors}`)
+
                 })
             break;
         // bands in town search=========================================================================
@@ -83,14 +88,15 @@ function searchLiri() {
             var searchC = search.split(" ").join("");
             axios.get("https://rest.bandsintown.com/artists/" + searchC + '/events?app_id=codingbootcamp')
                 .then(function (response) {
-                    console.log(chalk.redBright.bold("Artist:"));
-                    console.log(response.data[0].lineup[0]);
-                    console.log(chalk.redBright.bold("Next Show:"));
-                    console.log(moment(response.data[0].datetime).format("MM/DD/YYYY"))
-                    console.log(chalk.redBright.bold("Venue:"));
-                    console.log(response.data[0].venue.name);
-                    console.log(chalk.redBright.bold("Location:"));
-                    console.log(response.data[0].venue.city + ", " + response.data[0].venue.region)
+                    console.log(`${chalk.redBright.bold("Artist:")}
+${response.data[0].lineup[0]}
+${chalk.redBright.bold("Next Show:")}
+${moment(response.data[0].datetime).format("MM/DD/YYYY")}
+${chalk.redBright.bold("Venue:")}
+${response.data[0].venue.name}
+${chalk.redBright.bold("Location:")}
+${response.data[0].venue.city + ", " + response.data[0].venue.region}`)
+
                 })
             break;
     }
@@ -100,8 +106,7 @@ function read() {
         if (error) {
             return console.log(error)
         } else {
-            var dataArr = data.split(",");
-            //universal function??
+            var dataArr = data.split(",")
             input = dataArr[0];
             if (dataArr[1].charAt(0) === '"' && dataArr[1].charAt(dataArr[1].length - 1) === '"') {
                 search = dataArr[1].substr(1, dataArr[1].length - 2);
