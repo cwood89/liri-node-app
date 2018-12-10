@@ -1,5 +1,5 @@
 require("dotenv").config();
-var chalk = require("chalk")
+var chalk = require("chalk");
 var moment = require("moment");
 var axios = require("axios");
 var key = require("./keys.js");
@@ -7,7 +7,6 @@ var fs = require("fs");
 var Spotify = require("node-spotify-api");
 var spotify = new Spotify(key.spotify);
 var search = process.argv.slice(3).join(" ");
-var searchC = process.argv.slice(3).join("");
 var input = process.argv[2];
 
 function searchLiri() {
@@ -18,89 +17,141 @@ function searchLiri() {
             break;
         // spotify song search===========================================================================
         case "spotify-this-song":
+            if (!search) {
+                search = "The Sign Ace of Base"
+            }
             spotify.search({ type: 'track', query: search, limit: 1 }, function (err, data) {
                 if (err) {
                     return console.log('Error occurred: ' + err);
-                }
 
-                console.log(`${chalk.redBright.bold("Song:")}
-${data.tracks.items[0].name} 
+                } else {
+                    var jsonData = data.tracks.items[0];
+                    var output = [
+                        "Song: " + jsonData.name,
+                        "Artist: " + jsonData.artists[0].name,
+                        "Spotify Link: " + jsonData.external_urls.spotify,
+                        "ALbum: " + jsonData.album.name
+                    ].join("\n\n");
+
+                    console.log(`${chalk.redBright.bold("Song:")}
+${jsonData.name} 
 ${chalk.redBright.bold("Artist:")}
-${data.tracks.items[0].artists[0].name}
+${jsonData.artists[0].name}
 ${chalk.redBright.bold("Spotify Link:")}
-${data.tracks.items[0].external_urls.spotify}
+${jsonData.external_urls.spotify}
 ${chalk.redBright.bold("Album:")}
-${data.tracks.items[0].album.name}`)
+${jsonData.album.name}`);
+                    write(output);
+                };
 
             });
 
             break;
         // spotify artist search========================================================================
         case "spotify-this-artist":
+            if (!search) {
+                search = "Tame Impala"
+            }
             spotify.search({ type: 'artist', query: search, limit: 5 }, function (err, data) {
                 if (err) {
                     return console.log('Error occurred: ' + err);
-                }
-
-                console.log(`${chalk.redBright.bold("Artist:")}
-${data.artists.items[0].name}
+                } else {
+                    var jsonData = data.artists.items[0];
+                    console.log(`${chalk.redBright.bold("Artist:")}
+${jsonData.name}
 ${chalk.redBright.bold("Genre:")}
-${data.artists.items[0].genres[0]}`)
-
+${jsonData.genres[0]}`)
+                };
+                var output = [
+                    "Artist: " + jsonData.name,
+                    "Genre: " + jsonData.genres[0]
+                ].join("\n\n");
+                write(output)
             });
 
             spotify.search({ type: 'track', query: search, limit: 5 }, function (err, data) {
                 if (err) {
                     return console.log('Error occurred: ' + err);
-                }
-                console.log(chalk.redBright.bold("Top Songs:"))
-                for (var i = 0; i < data.tracks.items.length; i++) {
-                    console.log(data.tracks.items[i].name)
-                }
+                } else {
+                    console.log(chalk.redBright.bold("Top Songs:"))
+                    for (var i = 0; i < data.tracks.items.length; i++) {
+                        console.log(data.tracks.items[i].name)
+                    }
+                };
+
             });
+
+
             break;
         // imdb movie search =======================================================================
         case "movie-this":
+            if (!search) {
+                search = "Mr Nobody"
+            }
             var queryUrl = "http://www.omdbapi.com/?t=" + search + "&y=&plot=short&apikey=trilogy";
-            axios.get(queryUrl).then(
-                function (response) {
-                    console.log(`${chalk.redBright.bold("Title:")}
-${response.data.Title}
+            axios.get(queryUrl).then(function (response) {
+                var data = response.data
+                var output = [
+                    "Title: " + data.Title,
+                    "Year: " + data.Year,
+                    "IMDB Rating: " + data.Ratings[0].Value,
+                    "Rotten Tomatoes Rating: " + data.Ratings[1].Value,
+                    "Country: " + data.Country,
+                    "Language: " + data.Language,
+                    "Plot: " + data.Plot,
+                    "Actors: " + data.Actors
+                ].join("\n\n");
+                write(output)
+                console.log(`${chalk.redBright.bold("Title:")}
+${data.Title}
 ${chalk.redBright.bold("Year:")}
-${response.data.Year}
+${data.Year}
 ${chalk.redBright.bold("IMDB Rating:")}
-${response.data.Ratings[0].Value}
+${data.Ratings[0].Value}
 ${chalk.redBright.bold("Rotten Tomatoes Rating:")}
-${response.data.Ratings[1].Value}
+${data.Ratings[1].Value}
 ${chalk.redBright.bold("Country:")}
-${response.data.Country}
+${data.Country}
 ${chalk.redBright.bold("Language:")}
-${response.data.Language}
+${data.Language}
 ${chalk.redBright.bold("Plot:")}
-${response.data.Plot}
+${data.Plot}
 ${chalk.redBright.bold("Actors:")}
-${response.data.Actors}`)
+${data.Actors}`)
 
-                })
+            })
             break;
         // bands in town search=========================================================================
         case "concert-this":
+            if (!search) {
+                search = "Tame Impala"
+            }
             var searchC = search.split(" ").join("");
             axios.get("https://rest.bandsintown.com/artists/" + searchC + '/events?app_id=codingbootcamp')
                 .then(function (response) {
+                    var data = response.data[0]
+                    var output = [
+                        "Artist: " + data.lineup[0],
+                        "Next Show: " + moment(data.datetime).format("MM/DD/YYYY"),
+                        "Venue: " + data.venue.name,
+                        "Location: " + data.venue.city + ", " + data.venue.region
+                    ].join("\n\n");
+                    write(output)
                     console.log(`${chalk.redBright.bold("Artist:")}
-${response.data[0].lineup[0]}
+${data.lineup[0]}
 ${chalk.redBright.bold("Next Show:")}
-${moment(response.data[0].datetime).format("MM/DD/YYYY")}
+${moment(data.datetime).format("MM/DD/YYYY")}
 ${chalk.redBright.bold("Venue:")}
-${response.data[0].venue.name}
+${data.venue.name}
 ${chalk.redBright.bold("Location:")}
-${response.data[0].venue.city + ", " + response.data[0].venue.region}`)
+${data.venue.city}, ${data.venue.region}`);
 
                 })
+
             break;
-    }
+    };
 };
+
 function read() {
     fs.readFile("random.txt", "utf-8", function (error, data) {
         if (error) {
@@ -108,6 +159,7 @@ function read() {
         } else {
             var dataArr = data.split(",")
             input = dataArr[0];
+
             if (dataArr[1].charAt(0) === '"' && dataArr[1].charAt(dataArr[1].length - 1) === '"') {
                 search = dataArr[1].substr(1, dataArr[1].length - 2);
             } else {
@@ -116,7 +168,17 @@ function read() {
             console.log(chalk.greenBright.bold(input, search))
             searchLiri();
 
-        }
-    })
+        };
+    });
 };
-searchLiri();
+
+function write(x) {
+    var divider = "\n------------------------------------------------------------\n\n";
+    fs.appendFile("log.txt", x + divider, function (err) {
+        if (err) {
+            console.log(err);
+        }
+
+    });
+};
+searchLiri()
